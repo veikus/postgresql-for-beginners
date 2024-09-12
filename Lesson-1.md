@@ -26,37 +26,37 @@ You can put any name on the “General” tab, then switch to the “Connection�
 in “Host name/address” to “playground-postgres” (same as the container name from the docker run command above),
 the password as “hello,” and turn on the “Save password” toggle.
 
-![Register server interface](images/001/Register server.png)
+![Register server interface](images/001/Register-server.png)
 
 You can skip other settings for now and click “Save.”
 PGAdmin will check if it can connect to the server and add it to a list on the left.
 
 Let’s create a new database now. Right-click a newly created server and select “Create” → “Database”.
 
-![Create database menu](images/001/Create database.png)
+![Create database menu](images/001/Create-database.png)
 
 We can now set only a database name and leave all other properties default.
 
-![Database properties](images/001/Create database properties.png)
+![Database properties](images/001/Create-database-properties.png)
 
 Now, let’s create a new table, so we can finally work with data. Open a newly created database and right-click
 on “Schemas” → “public” -> “Tables” and Create a table.
 
-![Create table menu](images/001/Create table.png)
+![Create table menu](images/001/Create-table.png)
 
 Set a table name to “users” and create a few columns on the “Columns” tab. Click “+” on the right and make a column
 for user ID and email. Add a “Primary key” for an “id” column.
 
-![Create table columns](images/001/Create table columns.png)
+![Create table columns](images/001/Create-table-columns.png)
 
 If you’re familiar with MySQL, it automatically adds an auto-increment for the PRIMARY key.
 Let’s add similar functionality to our table. Let’s create a sequence.
 
-![Create sequence](images/001/Create sequence.png)
+![Create sequence](images/001/Create-sequence.png)
 
 Let’s call it “user_id_seq” and link to our newly created table on the “Definition” tab.
 
-![Sequence definition](images/001/Sequence definition.png)
+![Sequence definition](images/001/Sequence-definition.png)
 
 Open the properties of the “users” table (by right-clicking on it and selecting “Properties”).
 And add a default value for the “id” column as “nextval('user_id_seq'::regclass)”.
@@ -65,11 +65,11 @@ Now, we can finally create our first record. Go back to the “users” table, r
 and select “View/edit data” → “All rows.” Click “Add row” several times and write some emails in the “email” column.
 Then click “Save Data Changes”.
 
-![Add data to the table](images/001/Add data to the table.png)
+![Add data to the table](images/001/Add-data-to-the-table.png)
 
 Congratulations, you’ve created your first users.
 
-![First users](images/001/First users.png)
+![First users](images/001/First-users.png)
 
 ## Command line way
 
