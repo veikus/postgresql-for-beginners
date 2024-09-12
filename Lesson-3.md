@@ -103,3 +103,214 @@ LIMIT 2 OFFSET 1;
 ```
 
 This query returns 2 rows from the users table, starting from the second row.
+
+## Aggregating data
+
+You can use aggregate functions to perform calculations on the data in your tables. Let's add a new column to the users
+table with a company name:
+
+```sql
+ALTER TABLE users ADD COLUMN company_name VARCHAR(255);
+UPDATE users SET company_name = 'Planet Express' WHERE email LIKE '%@planetexpress.com';
+UPDATE users SET company_name = 'MomCorp' WHERE email LIKE '%@momcorp.com';
+UPDATE users SET company_name = 'DOOP' WHERE email LIKE '%@doop.org';
+UPDATE users SET company_name = 'NNYPD' WHERE email LIKE '%@newnewyorkpolice.com';
+```
+
+Now you can use aggregate functions to count the number of users in each company:
+
+```sql
+SELECT company_name, COUNT(*)
+FROM users
+GROUP BY company_name;
+```
+
+This query returns the number of users in each company.
+
+```text
+  company_name  | count
+----------------+-------
+ NNYPD          |     2
+ DOOP           |     1
+ Planet Express |     7
+ MomCorp        |     1
+(4 rows)
+```
+
+You can filter aggregated results using the HAVING clause:
+
+```sql
+SELECT company_name, COUNT(*)
+FROM users
+GROUP BY company_name
+HAVING COUNT(*) > 1;
+```
+
+This query returns only companies with more than 1 users.
+
+```text
+  company_name  | count
+----------------+-------
+ NNYPD          |     2
+ Planet Express |     7
+(2 rows)
+```
+
+## Joining tables
+
+Often, data is spread across multiple tables. To retrieve related data, you can join tables:
+
+```sql
+SELECT * FROM events
+JOIN users ON events.user_id = users.id;
+```
+
+This query returns all events with user data.
+
+```text
+ id | user_id | name  |         created_at         | id |             email             |           name           | job_title |  company_name
+----+---------+-------+----------------------------+----+-------------------------------+--------------------------+-----------+----------------
+  2 |       2 | Party | 2024-09-11 10:35:24.667882 |  2 | kissmyshiny@planetexpress.com | Bender Bending Rodríguez |           | Planet Express
+(1 row)
+```
+
+You can also use aliases to make the query more readable:
+
+```sql
+SELECT e.id, e.name, e.created_at, u.email, u.name AS user_name
+FROM events e
+JOIN users u ON e.user_id = u.id;
+```
+
+This is also useful when you have same column names in different tables.
+
+There are also different types of joins: INNER JOIN, LEFT JOIN, RIGHT JOIN, and FULL JOIN. Each type of join has its own
+use case.
+
+**INNER JOIN**
+An INNER JOIN returns only the records that have matching values in both tables.
+In other words, it combines rows from two or more tables based on a related column between them,
+but only where the condition is met.
+
+It's a default join type, so you can omit the INNER keyword:
+
+```sql
+SELECT e.id, e.name, e.created_at, u.email, u.name AS user_name
+FROM events e
+INNER JOIN users u ON e.user_id = u.id;
+```
+
+This will return only the events that have a corresponding user in the users table.
+If an event doesn’t have an associated user, it won’t appear in the result.
+
+**LEFT JOIN**
+
+A LEFT JOIN returns all records from the left table (the first table mentioned), and the matched records from the right
+table. If there is no match, the result is NULL on the right side.
+
+```sql
+SELECT e.id, e.name, e.created_at, u.email, u.name AS user_name
+FROM events e
+LEFT JOIN users u ON e.user_id = u.id;
+```
+
+This will return all events, even if there is no associated user. For events without a user, the columns from the users
+table will contain NULL.
+
+**RIGHT JOIN**
+A RIGHT JOIN returns all records from the right table (the second table mentioned), and the matched records from the
+left table. If there is no match, the result is NULL on the left side.
+
+```sql
+SELECT e.id, e.name, e.created_at, u.email, u.name AS user_name
+FROM events e
+RIGHT JOIN users u ON e.user_id = u.id;
+```
+
+This will return all users, even if they haven’t created any events. If a user has no events, the columns from the
+events table will contain NULL.
+
+**FULL JOIN**
+A FULL JOIN returns all records when there is a match in either the left or right table. It combines the results of both
+LEFT JOIN and RIGHT JOIN.
+
+```sql
+SELECT e.id, e.name, e.created_at, u.email, u.name AS user_name
+FROM events e
+FULL JOIN users u ON e.user_id = u.id;
+```
+
+This will return all events and all users, with NULL values wherever there isn’t a match.
+
+**CROSS JOIN**
+A CROSS JOIN returns the Cartesian product of the two tables. This means it combines each row of the first table with
+all rows of the second table.
+
+```sql
+SELECT e.id, e.name, u.name AS user_name
+FROM events e
+CROSS JOIN users u;
+```
+
+## Using Subqueries
+
+A subquery is a query nested inside another query. You can use subqueries to filter, sort, or aggregate data.
+
+For example, to find all users who have created an event:
+
+```sql
+SELECT *
+FROM users
+WHERE id IN (SELECT user_id FROM events);
+```
+
+This query returns all users who have created an event.
+The same result can be achieved with a JOIN:
+
+```sql
+SELECT u.*
+FROM users u
+JOIN events e ON u.id = e.user_id;
+```
+
+Both queries return the same result.
+
+```text
+playground=# SELECT *
+FROM users
+WHERE id IN (SELECT user_id FROM events);
+ id |             email             |           name           | job_title |  company_name
+----+-------------------------------+--------------------------+-----------+----------------
+  2 | kissmyshiny@planetexpress.com | Bender Bending Rodríguez |           | Planet Express
+(1 row)
+
+
+playground=# SELECT u.*
+FROM users u
+JOIN events e ON u.id = e.user_id;
+ id |             email             |           name           | job_title |  company_name
+----+-------------------------------+--------------------------+-----------+----------------
+  2 | kissmyshiny@planetexpress.com | Bender Bending Rodríguez |           | Planet Express
+(1 row)
+```
+
+## Using DISTINCT to Remove Duplicates
+
+If you need to remove duplicate rows from your results, use the DISTINCT keyword:
+
+```sql
+SELECT DISTINCT company_name
+FROM users;
+```
+
+This query returns only unique company names from the users table.
+
+```text
+  company_name
+----------------
+ NNYPD
+ DOOP
+ Planet Express
+ MomCorp
+(4 rows)
+```
