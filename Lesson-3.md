@@ -1,7 +1,8 @@
 # Lesson 3: CRUD operations. SELECT operation
 
-The SELECT statement retrieves data from one or more tables in your database. You can filter, sort, and limit
-the results to get the data you need.
+The SELECT statement is the most commonly used SQL command. It allows you to retrieve data from one or more tables in
+your database. With SELECT, you can filter, sort, and limit the results to obtain exactly the data you need. It is
+widely used in reporting, data analysis, and web applications to retrieve information stored in the database.
 
 [Official documentation for SELECT](https://www.postgresql.org/docs/16/sql-select.html)
 
@@ -32,6 +33,10 @@ FROM users;
 
 This will return all columns and all rows in the users table.
 
+*Note: Using SELECT * is often discouraged in production environments, especially when working with large tables. It
+retrieves all columns, which may include unnecessary data and affect performance. It’s better to explicitly specify the
+columns you need when possible.*
+
 ## Retrieving Specific Columns
 
 If you only need specific columns, list them explicitly:
@@ -53,6 +58,19 @@ WHERE email = 'kissmyshiny@planetexpress.com';
 ```
 
 This query returns only the rows where the email column matches 'kissmyshiny@planetexpress.com'.
+
+In addition to simple conditions like = or !=, you can use comparison operators (>, <, >=, <=) and pattern matching with
+LIKE.
+
+For example, to find all users with an email from "Planet Express", use LIKE:
+
+```sql
+SELECT * 
+FROM users 
+WHERE email LIKE '%@planetexpress.com';
+```
+
+This query returns all rows where the email column contains “@planetexpress.com”.
 
 ## Using Logical Operators
 
@@ -81,6 +99,15 @@ ORDER BY email ASC;
 ```
 
 This query returns all users sorted by email in ascending order.
+
+In addition to sorting in ascending order (ASC), you can sort in descending order (DESC):
+
+```sql
+SELECT * FROM users
+ORDER BY id DESC;
+```
+
+This query returns all users sorted by id in descending order, meaning the largest id will appear first.
 
 ## Limiting Results with LIMIT
 
@@ -156,9 +183,14 @@ This query returns only companies with more than 1 users.
 (2 rows)
 ```
 
+In addition to COUNT(), PostgreSQL provides other useful aggregate functions such as SUM(), AVG(), MIN(), and MAX().
+These are often used in reporting or to calculate statistics on numeric columns.
+
 ## Joining tables
 
-Often, data is spread across multiple tables. To retrieve related data, you can join tables:
+Before diving into the types of joins, it’s important to understand why joins are used. In relational databases, data is
+often stored across multiple tables. A JOIN allows you to retrieve related data from these different tables by combining
+them on a shared key (often a foreign key).
 
 ```sql
 SELECT * FROM events
@@ -293,6 +325,23 @@ JOIN events e ON u.id = e.user_id;
   2 | kissmyshiny@planetexpress.com | Bender Bending Rodríguez |           | Planet Express
 (1 row)
 ```
+
+**Types of Subqueries:** Subqueries can return different types of results:
+
+* Scalar subquery: Returns a single value.
+* Table subquery: Returns multiple rows and columns.
+* Set subquery: Returns a set of values that can be used with IN.
+
+[//]: <> (TODO: Find a better example)
+
+For example, a scalar subquery could be used to retrieve a specific value:
+
+```sql
+SELECT * FROM users WHERE
+id = (SELECT user_id FROM events WHERE name = 'Party' LIMIT 1)
+```
+
+This query returns the user who created the event named 'Party'.
 
 ## Using DISTINCT to Remove Duplicates
 
