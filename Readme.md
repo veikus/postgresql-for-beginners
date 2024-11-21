@@ -2,3 +2,4 @@
 [Lesson 2: CRUD operations. INSERT operation](Lesson-2.md)  
 [Lesson 3: CRUD operations. SELECT operation](Lesson-3.md)  
 [Lesson 4: Exercises on Conditions, Joins, and Subqueries](Lesson-4.md)  
+[Lesson 5: CRUD operations. UPDATE operation](Lesson-5.md)
